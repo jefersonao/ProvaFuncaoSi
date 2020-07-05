@@ -20,7 +20,7 @@ namespace FI.AtividadeEntrevista.DAL
         internal long Incluir(DML.Cliente cliente)
         {
             List<System.Data.SqlClient.SqlParameter> parametros = new List<System.Data.SqlClient.SqlParameter>();
-            
+
             parametros.Add(new System.Data.SqlClient.SqlParameter("Nome", cliente.Nome));
             parametros.Add(new System.Data.SqlClient.SqlParameter("Sobrenome", cliente.Sobrenome));
             parametros.Add(new System.Data.SqlClient.SqlParameter("Nacionalidade", cliente.Nacionalidade));
@@ -85,6 +85,29 @@ namespace FI.AtividadeEntrevista.DAL
             qtd = iQtd;
 
             return cli;
+        }
+
+        /// <summary>
+        /// Trazer os Beneficiarios por id do Cliente
+        /// </summary>
+        /// <param name="idCliente"></param>
+        /// <returns></returns>
+        internal List<DML.Beneficiario> PesquisaBeneficiariosPorIdCliente(long idCliente)
+        {
+            List<System.Data.SqlClient.SqlParameter> parametros = new List<System.Data.SqlClient.SqlParameter>();
+
+            parametros.Add(new System.Data.SqlClient.SqlParameter("IDCLIENTE", idCliente));
+
+            DataSet ds = base.Consultar("FI_SP_PesqBenef", parametros);
+            List<DML.Beneficiario> bnf = ConverterBeneficiario(ds);
+
+            int iQtd = 0;
+
+            if (ds.Tables.Count > 1 && ds.Tables[1].Rows.Count > 0)
+                int.TryParse(ds.Tables[1].Rows[0][0].ToString(), out iQtd);
+
+
+            return bnf;
         }
 
         /// <summary>
@@ -164,5 +187,59 @@ namespace FI.AtividadeEntrevista.DAL
 
             return lista;
         }
+
+        private List<DML.Beneficiario> ConverterBeneficiario(DataSet ds)
+        {
+            List<DML.Beneficiario> lista = new List<DML.Beneficiario>();
+            if (ds != null && ds.Tables != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                foreach (DataRow row in ds.Tables[0].Rows)
+                {
+                    DML.Beneficiario bnf = new DML.Beneficiario();
+                    bnf.Id = row.Field<long>("Id");
+                    bnf.Nome = row.Field<string>("Nome");
+                    bnf.CPF = row.Field<string>("CPF");
+                    bnf.IdCliente = row.Field<long>("IdCliente");
+                    lista.Add(bnf);
+                }
+            }
+
+            return lista;
+        }
+        /// <summary>
+        /// Inclui um novo Beneficiario ao CLiente
+        /// </summary>
+        /// <param name="bnf">Objeto de cliente</param>
+        internal long IncluirBnf(DML.Beneficiario bnf)
+        {
+            List<System.Data.SqlClient.SqlParameter> parametros = new List<System.Data.SqlClient.SqlParameter>();
+
+            parametros.Add(new System.Data.SqlClient.SqlParameter("Nome", bnf.Nome));
+            parametros.Add(new System.Data.SqlClient.SqlParameter("CPF", bnf.CPF));
+            parametros.Add(new System.Data.SqlClient.SqlParameter("IdCliente", bnf.IdCliente));
+
+            DataSet ds = base.Consultar("FI_SP_IncBenef", parametros);
+            long ret = 0;
+            if (ds.Tables[0].Rows.Count > 0)
+                long.TryParse(ds.Tables[0].Rows[0][0].ToString(), out ret);
+            return ret;
+        }
+
+
+        /// <summary>
+        /// Inclui um novo cliente
+        /// </summary>
+        /// <param name="cliente">Objeto de cliente</param>
+        internal void AlterarBnf(DML.Beneficiario bnf)
+        {
+            List<System.Data.SqlClient.SqlParameter> parametros = new List<System.Data.SqlClient.SqlParameter>();
+
+            parametros.Add(new System.Data.SqlClient.SqlParameter("Nome", bnf.Nome));          
+            parametros.Add(new System.Data.SqlClient.SqlParameter("IdCliente", bnf.IdCliente));
+            parametros.Add(new System.Data.SqlClient.SqlParameter("CPF", bnf.CPF));
+
+            base.Executar("FI_SP_AltBenef", parametros);
+        }
+
     }
 }

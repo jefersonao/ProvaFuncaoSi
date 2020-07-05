@@ -25,7 +25,7 @@ namespace WebAtividadeEntrevista.Controllers
         public JsonResult Incluir(ClienteModel model)
         {
             BoCliente bo = new BoCliente();
-            
+
             if (!this.ModelState.IsValid)
             {
                 List<string> erros = (from item in ModelState.Values
@@ -38,9 +38,9 @@ namespace WebAtividadeEntrevista.Controllers
             }
             else
             {
-                
+
                 model.Id = bo.Incluir(new Cliente()
-                {                    
+                {
                     CEP = model.CEP,
                     Cidade = model.Cidade,
                     Email = model.Email,
@@ -54,7 +54,7 @@ namespace WebAtividadeEntrevista.Controllers
 
                 });
 
-           
+
                 return Json("Cadastro efetuado com sucesso");
             }
         }
@@ -63,7 +63,7 @@ namespace WebAtividadeEntrevista.Controllers
         public JsonResult Alterar(ClienteModel model)
         {
             BoCliente bo = new BoCliente();
-       
+
             if (!this.ModelState.IsValid)
             {
                 List<string> erros = (from item in ModelState.Values
@@ -89,7 +89,7 @@ namespace WebAtividadeEntrevista.Controllers
                     Telefone = model.Telefone,
                     CPF = model.CPF
                 });
-                               
+
                 return Json("Cadastro alterado com sucesso");
             }
         }
@@ -118,7 +118,7 @@ namespace WebAtividadeEntrevista.Controllers
                     CPF = cliente.CPF
                 };
 
-            
+
             }
 
             return View(model);
@@ -150,5 +150,149 @@ namespace WebAtividadeEntrevista.Controllers
                 return Json(new { Result = "ERROR", Message = ex.Message });
             }
         }
+
+        //Remote validation
+        [AllowAnonymous]
+        [HttpPost]
+        public ActionResult CpfnewValid(string cpf, bool alter)
+        {
+            //Verifica se Cpf é valido
+            if (!CPFValido(cpf))
+                return Json(0);
+            if (alter == false)
+            {
+                if (cpf != "" && cpf != null)
+                {
+                    BoCliente bo = new BoCliente();
+
+                    if (bo.VerificarExistencia(cpf.Trim()))
+                    {
+                        return Json(1);
+                    }
+                }
+            }
+            return Json(2);
+        }
+
+        public bool CPFValido(string cpf)
+        {
+            //Remove formatação do número, ex: "123.456.789-01" vira: "12345678901"
+
+            if (cpf.Length > 11)
+                return false;
+
+            while (cpf.Length != 11)
+                cpf = '0' + cpf;
+
+            bool igual = true;
+            for (int i = 1; i < 11 && igual; i++)
+                if (cpf[i] != cpf[0])
+                    igual = false;
+
+            if (igual || cpf == "12345678909")
+                return false;
+
+            int[] numeros = new int[11];
+
+            for (int i = 0; i < 11; i++)
+                numeros[i] = int.Parse(cpf[i].ToString());
+
+            int soma = 0;
+            for (int i = 0; i < 9; i++)
+                soma += (10 - i) * numeros[i];
+
+            int resultado = soma % 11;
+
+            if (resultado == 1 || resultado == 0)
+            {
+                if (numeros[9] != 0)
+                    return false;
+            }
+            else if (numeros[9] != 11 - resultado)
+                return false;
+
+            soma = 0;
+            for (int i = 0; i < 10; i++)
+                soma += (11 - i) * numeros[i];
+
+            resultado = soma % 11;
+
+            if (resultado == 1 || resultado == 0)
+            {
+                if (numeros[10] != 0)
+                    return false;
+            }
+            else
+                if (numeros[10] != 11 - resultado)
+                return false;
+
+            return true;
+        }
+
+
+        public PartialViewResult GetBeneficiarios(long idCliente)
+        {
+            List<Beneficiario> bnfs = new BoCliente().ListarBnf(idCliente);
+            return PartialView(bnfs);
+
+        }
+
+        [HttpPost]
+        public JsonResult IncluirBnf(BeneficiarioModel model)
+        {
+            BoCliente bo = new BoCliente();
+
+            if (!this.ModelState.IsValid)
+            {
+                List<string> erros = (from item in ModelState.Values
+                                      from error in item.Errors
+                                      select error.ErrorMessage).ToList();
+
+                Response.StatusCode = 400;
+
+                return Json(string.Join(Environment.NewLine, erros));
+            }
+            else
+            {
+                model.Id = bo.IncluirBnf(new Beneficiario()
+                {
+                    Nome = model.Nome,
+                    CPF = model.CPF,
+                    IdCliente = model.IdCliente
+                });
+
+
+                return Json("Cadastro efetuado com sucesso");
+            }
+        }
+
+        [HttpPost]
+        public JsonResult AlterarBnf(BeneficiarioModel model)
+        {
+            BoCliente bo = new BoCliente();
+
+            if (!this.ModelState.IsValid)
+            {
+                List<string> erros = (from item in ModelState.Values
+                                      from error in item.Errors
+                                      select error.ErrorMessage).ToList();
+
+                Response.StatusCode = 400;
+                return Json(string.Join(Environment.NewLine, erros));
+            }
+            else
+            {
+                bo.AlterarBnf(new Beneficiario()
+                {
+                    Id = model.Id,
+                    Nome = model.Nome,
+                    CPF = model.CPF,
+                    IdCliente = model.IdCliente
+                });
+
+                return Json("Cadastro alterado com sucesso");
+            }
+        }
+
     }
 }

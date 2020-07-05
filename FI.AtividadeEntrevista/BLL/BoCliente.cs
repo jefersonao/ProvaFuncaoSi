@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -60,12 +61,23 @@ namespace FI.AtividadeEntrevista.BLL
         }
 
         /// <summary>
+        /// Listar Beneficiarios do Cliente
+        /// </summary>
+        /// <param name="idCliente"></param>
+        /// <returns></returns>
+        public List<DML.Beneficiario> ListarBnf(long idCliente)
+        {
+            DAL.DaoCliente bnf = new DAL.DaoCliente();
+            return bnf.PesquisaBeneficiariosPorIdCliente(idCliente);
+        }
+
+        /// <summary>
         /// Lista os clientes
         /// </summary>
         public List<DML.Cliente> Pesquisa(int iniciarEm, int quantidade, string campoOrdenacao, bool crescente, out int qtd)
         {
             DAL.DaoCliente cli = new DAL.DaoCliente();
-            return cli.Pesquisa(iniciarEm,  quantidade, campoOrdenacao, crescente, out qtd);
+            return cli.Pesquisa(iniciarEm, quantidade, campoOrdenacao, crescente, out qtd);
         }
 
         /// <summary>
@@ -78,5 +90,22 @@ namespace FI.AtividadeEntrevista.BLL
             DAL.DaoCliente cli = new DAL.DaoCliente();
             return cli.VerificarExistencia(CPF);
         }
+
+        /// <summary>
+        /// Inclui um novo Beneficiario
+        /// </summary>
+        /// <param name="cliente">Objeto de cliente</param>
+        public long IncluirBnf(DML.Beneficiario bnf)
+        {
+            DAL.DaoCliente benef = new DAL.DaoCliente();
+            return benef.IncluirBnf(bnf);
+        }
+
+        public void AlterarBnf(DML.Beneficiario bnf)
+        {
+            DAL.DaoCliente benef = new DAL.DaoCliente();
+            benef.AlterarBnf(bnf);
+        }
+
     }
 }

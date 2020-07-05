@@ -9,3 +9,9 @@
     padding-right: 15px;
 }
 
+.error {
+    color: red;   
+}
+input.error {
+    border: red solid 0.5px;
+}

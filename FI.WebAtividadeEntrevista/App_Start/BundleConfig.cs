@@ -27,8 +27,12 @@ namespace WebAtividadeEntrevista
                       "~/Scripts/jtable/localization/jquery.jtable.pt-BR.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
-                     "~/Scripts/jquery.unobtrusive*",
-                     "~/Scripts/jquery.validate*"));
+                     "~/Scripts/jquery.unobtrusive.min.js",
+                     "~/Scripts/jquery.validate.min.js"));
+
+            //Input Mask
+            bundles.Add(new ScriptBundle("~/bundles/jquery.mask").Include(
+            "~/Scripts/jquery.mask.min.js"));
 
             //implementação de um script com partilhado entre os js de insercao e edicao para consultar api de cep
             bundles.Add(new ScriptBundle("~/bundles/UtilsAll").Include(
