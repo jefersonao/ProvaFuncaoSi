@@ -27,8 +27,9 @@ namespace WebAtividadeEntrevista
                       "~/Scripts/jtable/localization/jquery.jtable.pt-BR.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
-                     "~/Scripts/jquery.unobtrusive.min.js",
-                     "~/Scripts/jquery.validate.min.js"));
+                     "~/Scripts/jquery.validate.min.js",
+                     "~/Scripts/jquery.validate.unobtrusive.min.js"
+                     ));
 
             //Input Mask
             bundles.Add(new ScriptBundle("~/bundles/jquery.mask").Include(

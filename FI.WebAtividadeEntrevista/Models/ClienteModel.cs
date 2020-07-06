@@ -1,8 +1,11 @@
-﻿using System;
+﻿using FI.AtividadeEntrevista.DML;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
+using WebAtividadeEntrevista.CustomValidator;
 
 namespace WebAtividadeEntrevista.Models
 {
@@ -12,7 +15,7 @@ namespace WebAtividadeEntrevista.Models
     public class ClienteModel
     {
         public long Id { get; set; }
-        
+
         /// <summary>
         /// CEP
         /// </summary>
@@ -70,8 +73,14 @@ namespace WebAtividadeEntrevista.Models
         /// <summary>
         /// Cpf
         /// </summary>
-        ///         
+        ///    
+        [Required]
+        [CustomValidationCPF(ErrorMessage = "CPF inválido")]
+        [Remote("CpfnewValid", "Cliente", AdditionalFields = "alter", HttpMethod = "POST", ErrorMessage = "Cpf Já Cadastrado!")]
         public string CPF { get; set; }
 
-    }    
+        //Trazer os beneficiarios no post
+        public BeneficiarioModel[] Beneficiarios { get; set; }
+
+    }
 }

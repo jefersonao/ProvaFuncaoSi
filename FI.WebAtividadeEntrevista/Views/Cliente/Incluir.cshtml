@@ -9,4 +9,8 @@
     @Scripts.Render("~/bundles/clientes")
 }
 <h2>@Html.Raw(ViewBag.Title)</h2>
+
+@* Validar insercao ou edicao *@
+<input type="hidden" id="alter" name="alter" value="false" />
+
 @Html.Partial("Forms")

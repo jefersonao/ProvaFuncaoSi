@@ -87,6 +87,15 @@ namespace FI.AtividadeEntrevista.DAL
             return cli;
         }
 
+        internal void DeletarTodosBenef(long idCliente)
+        {
+            List<System.Data.SqlClient.SqlParameter> parametros = new List<System.Data.SqlClient.SqlParameter>();
+
+            parametros.Add(new System.Data.SqlClient.SqlParameter("IDCLIENTE", idCliente));
+
+            base.Executar("FI_SP_ExcluirTodosBenef", parametros);
+        }
+
         /// <summary>
         /// Trazer os Beneficiarios por id do Cliente
         /// </summary>

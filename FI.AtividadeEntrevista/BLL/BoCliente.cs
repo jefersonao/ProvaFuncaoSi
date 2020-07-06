@@ -101,6 +101,11 @@ namespace FI.AtividadeEntrevista.BLL
             return benef.IncluirBnf(bnf);
         }
 
+        public void DeletarTodosBenef(long idCliente)
+        {
+            DAL.DaoCliente benef = new DAL.DaoCliente();
+            benef.DeletarTodosBenef(idCliente);
+        }
         public void AlterarBnf(DML.Beneficiario bnf)
         {
             DAL.DaoCliente benef = new DAL.DaoCliente();

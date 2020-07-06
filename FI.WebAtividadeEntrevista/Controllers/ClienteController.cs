@@ -11,6 +11,13 @@ namespace WebAtividadeEntrevista.Controllers
 {
     public class ClienteController : Controller
     {
+        internal static List<Beneficiario> listBnf;
+
+        public ClienteController()
+        {
+            listBnf = new List<Beneficiario>();
+        }
+
         public ActionResult Index()
         {
             return View();
@@ -38,7 +45,6 @@ namespace WebAtividadeEntrevista.Controllers
             }
             else
             {
-
                 model.Id = bo.Incluir(new Cliente()
                 {
                     CEP = model.CEP,
@@ -54,6 +60,22 @@ namespace WebAtividadeEntrevista.Controllers
 
                 });
 
+                if (model.Beneficiarios != null && model.Beneficiarios.Count() > 0)
+                {
+                    //Gravar Beneficiarios desse Cliente
+                    foreach (BeneficiarioModel b in model.Beneficiarios)
+                    {
+                        Beneficiario bnf = new Beneficiario
+                        {
+                            IdCliente = model.Id,
+                            Nome = b.Nome,
+                            CPF = b.CPF
+                        };
+
+                        bo.IncluirBnf(bnf);
+
+                    }
+                }
 
                 return Json("Cadastro efetuado com sucesso");
             }
@@ -89,6 +111,26 @@ namespace WebAtividadeEntrevista.Controllers
                     Telefone = model.Telefone,
                     CPF = model.CPF
                 });
+
+                if (model.Beneficiarios != null && model.Beneficiarios.Count() > 0)
+                {
+                    //Recriar todos os Beneficiarios
+                    bo.DeletarTodosBenef(model.Id);
+
+                    //Gravar Beneficiarios desse Cliente
+                    foreach (BeneficiarioModel b in model.Beneficiarios)
+                    {
+                        Beneficiario bnf = new Beneficiario
+                        {
+                            IdCliente = model.Id,
+                            Nome = b.Nome,
+                            CPF = b.CPF
+                        };
+
+                        bo.IncluirBnf(bnf);
+
+                    }
+                }
 
                 return Json("Cadastro alterado com sucesso");
             }
@@ -229,69 +271,11 @@ namespace WebAtividadeEntrevista.Controllers
             return true;
         }
 
-
-        public PartialViewResult GetBeneficiarios(long idCliente)
+        public JsonResult GetBeneficiarios(long idCliente)
         {
             List<Beneficiario> bnfs = new BoCliente().ListarBnf(idCliente);
-            return PartialView(bnfs);
+            return Json(bnfs, JsonRequestBehavior.AllowGet);
 
-        }
-
-        [HttpPost]
-        public JsonResult IncluirBnf(BeneficiarioModel model)
-        {
-            BoCliente bo = new BoCliente();
-
-            if (!this.ModelState.IsValid)
-            {
-                List<string> erros = (from item in ModelState.Values
-                                      from error in item.Errors
-                                      select error.ErrorMessage).ToList();
-
-                Response.StatusCode = 400;
-
-                return Json(string.Join(Environment.NewLine, erros));
-            }
-            else
-            {
-                model.Id = bo.IncluirBnf(new Beneficiario()
-                {
-                    Nome = model.Nome,
-                    CPF = model.CPF,
-                    IdCliente = model.IdCliente
-                });
-
-
-                return Json("Cadastro efetuado com sucesso");
-            }
-        }
-
-        [HttpPost]
-        public JsonResult AlterarBnf(BeneficiarioModel model)
-        {
-            BoCliente bo = new BoCliente();
-
-            if (!this.ModelState.IsValid)
-            {
-                List<string> erros = (from item in ModelState.Values
-                                      from error in item.Errors
-                                      select error.ErrorMessage).ToList();
-
-                Response.StatusCode = 400;
-                return Json(string.Join(Environment.NewLine, erros));
-            }
-            else
-            {
-                bo.AlterarBnf(new Beneficiario()
-                {
-                    Id = model.Id,
-                    Nome = model.Nome,
-                    CPF = model.CPF,
-                    IdCliente = model.IdCliente
-                });
-
-                return Json("Cadastro alterado com sucesso");
-            }
         }
 
     }
